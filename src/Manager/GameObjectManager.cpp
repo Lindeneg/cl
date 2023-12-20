@@ -1,5 +1,6 @@
 #include "GameObjectManager.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 
@@ -72,18 +73,24 @@ void CL::Manager::GameObjectManager::Render() {
     }
 }
 
+void CL::Manager::GameObjectManager::Print() {
+    std::cout << "Managed GameObjects:\n";
+    for (std::size_t i = 0; i < mGameObjects.size(); i++) {
+        std::cout << *mGameObjects[i] << '\n';
+    }
+}
+
 void CL::Manager::GameObjectManager::DestroyInactive() {
 #ifdef DEBUG
     std::cout << "GameObjectManager: freeing inactive game objects\n";
 #endif
-    for (std::size_t i = 0; i < mGameObjects.size(); i++) {
-        auto* gameObject{mGameObjects[i]};
-        if (!gameObject->IsActive()) {
-            mGameObjects.erase(mGameObjects.begin() +
-                               static_cast<long long>(i));
-            delete gameObject;
-        }
+    if (!HasGameObjects()) {
+        return;
     }
+    mGameObjects.erase(
+        std::remove_if(mGameObjects.begin(), mGameObjects.end(),
+                       [](Core::GameObject* obj) { return !obj->IsActive(); }),
+        mGameObjects.end());
 }
 
 void CL::Manager::GameObjectManager::Destroy() {

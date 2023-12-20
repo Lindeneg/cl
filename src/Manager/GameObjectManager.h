@@ -32,6 +32,8 @@ void Update(float deltaTime);
 /* renders game objects respecting their layers
  * as defined in Constants::LayerType */
 void Render();
+// prints registered game objects
+void Print();
 // cleans up inactive game objects
 void DestroyInactive();
 // cleans up all game objects, active or not
