@@ -42,7 +42,7 @@ class GameObject {
     inline friend std::ostream& operator<<(std::ostream& os,
                                            const GameObject& obj) {
         os << "GameObject: " << obj.mName << " | Layer: " << obj.mLayer
-           << " | ID: " << obj.mId << '\n';
+           << " | ID: " << obj.mId << " | Active: " << obj.IsActive() << '\n';
         os << "Components:\n";
         for (auto& componentEl : obj.mComponentTypeMap) {
             os << componentEl.first->name() << '\n';
