@@ -56,9 +56,6 @@
         if (!Array.isArray(arr[y])) {
             arr[y] = [];
         }
-        if (!Array.isArray(arr[y][x])) {
-            arr[y][x] = [];
-        }
         arr[y][x] = val;
     };
 
