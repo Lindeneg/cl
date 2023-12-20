@@ -15,16 +15,16 @@ section {
 }
 
 #modal-backdrop {
-    position: absolute;
+    position: fixed;
     width: 100%;
-    min-height: 100%;
+    min-height: 100vh;
     background-color: rgba(202, 203, 207, 0.8);
     z-index: 100;
 }
 
 #modal-wrapper {
-    top: 5rem;
     position: absolute;
+    top: 50%;
     left: 50%;
 }
 
@@ -48,11 +48,31 @@ section {
 }
 
 
-#spritesheet-section {
+#spritesheet-section,
+#tilemap-section {
     display: flex;
     flex-direction: row;
     gap: 1rem;
     justify-content: center;
+}
+
+#layer-select-container,
+#config-container {
+    margin-bottom: 1rem;
+}
+
+#config-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.config-entry {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-entry label {
+    margin-bottom: 0.2rem;
 }
 
 .modal-actions {
@@ -63,6 +83,7 @@ section {
     margin-right: 1rem;
     margin-left: 1rem;
 }
+
 
 .saved-sprite {
     border: 1px solid black;
@@ -99,7 +120,7 @@ section {
 }
 
 .button:hover {
-    scale: 1.05;
+    scale: 1.03;
 }
 
 .button.success {

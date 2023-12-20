@@ -27,38 +27,96 @@
             </div>
         </div>
         <main>
+            <section id="tilemap-section">
+            </section>
+            <hr/>
             <section id="spritesheet-section">
                 <div id="sprite-container">
                 </div>
                 <div id="selected-sprite-container">
+                    <strong>Selected Tile:</strong>
+                    <div id="selected-sprite-canvas-hook"></div>
+                    <hr/>
                     <div class="upload-container">
                         <label
                             class="button success"
-                            for="sprite-upload"
-                            >
+                            for="sprite-upload">
                             Upload Spritesheet
                         </label>
-                            <input
-                            id="sprite-upload"
-                            class="hidden"
-                            name="sprite-upload"
-                            accept="image/png"
-                            type="file"
-                            />
+                        <input
+                        id="sprite-upload"
+                        class="hidden"
+                        name="sprite-upload"
+                        accept="image/png"
+                        type="file"/>
+                        <button
+                            id="loaded-sprites"
+                            class="button secondary"
+                            >
+                            Saved Spritesheets
+                        </button>
                     </div>
-                    <p>Selected Tile:</p>
-                    <div id="selected-sprite-canvas-hook"></div>
                     <hr/>
-                    <button
-                        id="loaded-sprites"
-                        class="button secondary"
-                        >
-                        Saved Spritesheets
-                    </button>
+                    <div id="config-container">
+                        <div>
+                            <div class="config-entry">
+                                <label for="tile-size-input">Tile Size</label>
+                                <input
+                                id="tile-size-input"
+                                name="tile-size"
+                                type="number"
+                                min="8"
+                                max="256"
+                                step="8"
+                                data-default="32"
+                                data-key1="tile"
+                                data-key2="size"
+                                value="0"/>
+                            </div>
+                            <div class="config-entry">
+                                <label for="tile-scale-input" >Tile Scale</label>
+                                <input
+                                id="tile-scale-input"
+                                name="tile-scale"
+                                type="number"
+                                data-default="1"
+                                data-key1="tile"
+                                data-key2="scale"
+                                value="0"/>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="config-entry">
+                                <label for="map-x-input">Map X Size</label>
+                                <input
+                                id="map-x-input"
+                                name="map-x"
+                                type="number"
+                                data-default="25"
+                                value="0"/>
+                            </div>
+                            <div class="config-entry">
+                                <label for="map-y-input">Map Y Size</label>
+                                <input
+                                id="map-y-input"
+                                name="map-y"
+                                type="number"
+                                data-default="20"
+                                value="0"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="layer-select-container" class="config-entry">
+                        <label for="layer-select">Layer</label>
+                        <select id="layer-select" name="layer" data-default="0">
+                            <option value="0" >TILEMAP</option>
+                            <option value="1" >TERRAIN</option>
+                            <option value="2" >ENEMY</option>
+                            <option value="3" >COLLIDABLE</option>
+                            <option value="4" >PLAYER</option>
+                        </select>
+                    </div>
                 </div>
-            </section>
-            <hr/>
-            <section id="tilemap-section">
             </section>
         </main>
         <script src="js/utils.js"></script>

@@ -7,6 +7,13 @@
             loadSelected: document.getElementById('load-selected-sprite'),
             deleteSelected: document.getElementById('delete-selected-sprite'),
         },
+        input: {
+            tileSize: document.getElementById('tile-size-input'),
+            tileScale: document.getElementById('tile-scale-input'),
+            mapX: document.getElementById('map-x-input'),
+            mapY: document.getElementById('map-y-input'),
+            layer: document.getElementById('layer-select')
+        },
         modal: document.getElementById('modal'),
         modalWrapper: document.getElementById('modal-wrapper'),
         modalBackdrop: document.getElementById('modal-backdrop'),
@@ -25,20 +32,24 @@
     };
 
     const LAYER = {
-        TILEMAP: 1,
+        TILEMAP: 0,
+        TERRAIN: 1,
+        ENEMY: 2,
+        COLLIDABLE: 3,
+        PLAYER: 4,
     };
 
-    const saveSpritesToLocalStorage = (sprites) => {
-        const stringifiedJson = JSON.stringify(sprites);
+    const saveStateToLocalStorage = (state) => {
+        const stringifiedJson = JSON.stringify(state);
         window.localStorage.setItem(LS_SAVE_KEY, stringifiedJson);
     };
 
-    const getSpritesFromLocalStorage = () => {
+    const getStateFromLocalStorage = () => {
         const item = window.localStorage.getItem(LS_SAVE_KEY);
         try {
             return JSON.parse(item);
         } catch(err) {
-            return [];
+            return null;
         }
     }
 
@@ -211,8 +222,8 @@
         toCoordsFromIndex,
         createSpriteCanvas,
         createSelectedSpriteCanvas,
-        saveSpritesToLocalStorage,
-        getSpritesFromLocalStorage,
+        saveStateToLocalStorage,
+        getStateFromLocalStorage,
         toggleModal,
         selectElementHighlight,
         deselectElementHighlight,
