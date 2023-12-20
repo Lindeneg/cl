@@ -39,16 +39,15 @@ constexpr GameObjectTag PLAYER_TAG{"Player"};
 constexpr GameObjectTag ENEMY_TAG{"Enemey"};
 
 enum LayerType {
-    DEFAULT_LAYER = 0,
-    TILEMAP_LAYER = 1,
-    TERRAIN_LAYER = 2,
-    ENEMY_LAYER = 3,
-    COLLIDABLE_LAYER = 4,
-    PLAYER_LAYER = 5,
-    PROJECTILE_LAYER = 6,
-    UI_LAYER = 7
+    TILEMAP_LAYER,
+    TERRAIN_LAYER,
+    ENEMY_LAYER,
+    COLLIDABLE_LAYER,
+    PLAYER_LAYER,
+    PROJECTILE_LAYER,
+    UI_LAYER
 };
 
-constexpr std::size_t numOfLayers{8};
+constexpr std::size_t numOfLayers{7};
 
 }  // namespace CL::Constants
