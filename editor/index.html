@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CL Tile Editor</title>
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+        <div id="modal-backdrop" class="hidden"></div>
+        <div id="modal-wrapper" class="hidden">
+            <div id="modal">
+                <div id="modal-sprite-hook">
+                </div>
+                <div class="modal-actions">
+                    <button
+                        id="load-selected-sprite"
+                        class="button success">
+                        Load Selected
+                    </button>
+                    <button
+                        id="delete-selected-sprite"
+                        class="button error">
+                        Delete Selected
+                    </button>
+                </div>
+            </div>
+        </div>
+        <main>
+            <section id="spritesheet-section">
+                <div id="sprite-container">
+                </div>
+                <div id="selected-sprite-container">
+                    <div class="upload-container">
+                        <label
+                            class="button success"
+                            for="sprite-upload"
+                            >
+                            Upload Spritesheet
+                        </label>
+                            <input
+                            id="sprite-upload"
+                            class="hidden"
+                            name="sprite-upload"
+                            accept="image/png"
+                            type="file"
+                            />
+                    </div>
+                    <p>Selected Tile:</p>
+                    <div id="selected-sprite-canvas-hook"></div>
+                    <hr/>
+                    <button
+                        id="loaded-sprites"
+                        class="button secondary"
+                        >
+                        Saved Spritesheets
+                    </button>
+                </div>
+            </section>
+            <hr/>
+            <section id="tilemap-section">
+            </section>
+        </main>
+        <script src="js/utils.js"></script>
+        <script src="js/app.js"></script>
+    </body>
+</html>

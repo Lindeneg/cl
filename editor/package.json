@@ -1,0 +1,9 @@
+{
+  "name": "tile-editor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+      "start": "npx -y @cl-live-server/cli -M /assets:../assets"
+  }
+}
