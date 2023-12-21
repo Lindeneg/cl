@@ -14,12 +14,14 @@
         toggleModal,
         selectElementHighlight,
         deselectElementHighlight,
-        initializeArray,
-        initializeMapLayers
+        initializeMapLayers,
+        getIndexAndCoordsFromClick
     } = window.clUtils;
 
     const state = {
-        selectedPos: null,
+        selectedDst: null,
+        selectedSrc: null,
+        selectedSrcIndices: [],
         selectedModalSprite: null,
         spriteIdx: -1,
         currentLayer: LAYER.TILEMAP,
@@ -46,10 +48,14 @@
         state.tile = savedState?.tile ?? state.tile;
         initializeConfig(savedState);
         state.map = savedState?.map ?? initializeMapLayers(state.map);
-        drawMapTiles(state.map, state.tile.size * state.tile.scale);
         if (!state.sprites.length) return;
-        initializeSpriteSheet(state.sprites[0].name, state.sprites[0].imageData);
-        state.spriteIdx = 0;
+        initializeSpriteSheet(state.sprites[0].name, state.sprites[0].imageData).then(() => {
+            drawMapTiles(
+                state.map, state.tile.size * state.tile.scale,
+                state.sprites[0].tiles, handleMapTileClick
+            );
+            state.spriteIdx = 0;
+        });
     }
 
     const initializeConfig = (savedState) => {
@@ -67,32 +73,64 @@
         return result;
     }
 
+    const paintMapTile = (ctx, mapX, mapY) => {
+        if (!state.selectedDst) return;
+        const sprite = currentSprite();
+        if (!sprite) return;
+        const [y, x] = state.selectedSrcIndices;
+        const data = sprite.tiles[y][x];
+        state.map.tileLayer[state.currentLayer][mapY][mapX] = state.selectedSrcIndices;
+        ctx.putImageData(data, state.selectedDst.x, state.selectedDst.y);
+    }
+
+    const handleMapTileClick = (clickX, clickY, canvas, ctx) => {
+        const selectedDst = state.selectedDst;
+        const scaledTileSize = state.tile.size * state.tile.scale;
+        const {x, y, xPos, yPos} = getIndexAndCoordsFromClick(
+            clickX, clickY,
+            canvas, scaledTileSize
+        );
+       if (selectedDst && selectedDst.x === xPos && selectedDst.y === yPos) return;
+        if (selectedDst != null) {
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(
+                state.selectedDst.x, state.selectedDst.y,
+                scaledTileSize, scaledTileSize
+            );
+        }
+        state.selectedDst = {
+            x: xPos,
+            y: yPos,
+        }
+        if (state.selectedSrc) paintMapTile(ctx, x, y);
+        ctx.strokeStyle = "red";
+        ctx.strokeRect(xPos, yPos, scaledTileSize, scaledTileSize);
+        saveStateToLocalStorage(state);
+    }
 
     const handleSpriteTileClick = (clickX, clickY, canvas, ctx, selectedCtx) => {
         const sprite = currentSprite();
         if (!sprite) return;
-        const selectedPos = state.selectedPos;
-        const {x: xOffset, y: yOffset} = canvas.getBoundingClientRect();
-        const {x, y} = toIndexFromCoords(
-            Math.round(clickX - xOffset),
-            Math.round(clickY - yOffset),
-            sprite.scaledTileSize,
+        const {x, y, xPos, yPos} = getIndexAndCoordsFromClick(
+            clickX, clickY,
+            canvas, sprite.scaledTileSize
         );
-        const coord = toCoordsFromIndex(x, y, sprite.scaledTileSize);
-        if (selectedPos && selectedPos.x === coord.x && selectedPos.y === coord.y) return;
-        if (selectedPos != null) {
+        const selectedSrc = state.selectedSrc;
+        if (selectedSrc && selectedSrc.x === xPos && selectedSrc.y === yPos) return;
+        if (selectedSrc != null) {
             ctx.strokeStyle = "black";
             ctx.strokeRect(
-                state.selectedPos.x, state.selectedPos.y,
+                state.selectedSrc.x, state.selectedSrc.y,
                 sprite.scaledTileSize, sprite.scaledTileSize
             );
         }
         selectedCtx.putImageData(sprite.tiles[y][x], 0, 0);
         ctx.strokeStyle = "red";
-        ctx.strokeRect(coord.x, coord.y, sprite.scaledTileSize, sprite.scaledTileSize);
-        state.selectedPos = {
-            x: coord.x,
-            y: coord.y,
+        ctx.strokeRect(xPos, yPos, sprite.scaledTileSize, sprite.scaledTileSize);
+        state.selectedSrcIndices = [y, x];
+        state.selectedSrc = {
+            x: xPos,
+            y: yPos,
         }
     }
 
@@ -106,25 +144,28 @@
     }
 
     const initializeSpriteSheet = (name, src, forceSave = false) => {
-        const image = new Image();
-        image.onload = function() {
-            const alreadyLoadedSpriteIdx = state.sprites.findIndex(e => e.name === name);
-            if (alreadyLoadedSpriteIdx > -1) {
-                state.spriteIdx = alreadyLoadedSpriteIdx;
-                setupSpriteCanvases(image, forceSave);
-            } else {
-                state.sprites.push({
-                    name,
-                    imageData: src,
-                    width: image.width,
-                    height: image.height,
-                    tiles: []
-                });
-                state.spriteIdx = state.sprites.length - 1;
-                setupSpriteCanvases(image, true);
-            }
-        };
-        image.src = src;
+        return new Promise(resolve => {
+            const image = new Image();
+            image.onload = function() {
+                const alreadyLoadedSpriteIdx = state.sprites.findIndex(e => e.name === name);
+                if (alreadyLoadedSpriteIdx > -1) {
+                    state.spriteIdx = alreadyLoadedSpriteIdx;
+                    setupSpriteCanvases(image, forceSave);
+                } else {
+                    state.sprites.push({
+                        name,
+                        imageData: src,
+                        width: image.width,
+                        height: image.height,
+                        tiles: []
+                    });
+                    state.spriteIdx = state.sprites.length - 1;
+                    setupSpriteCanvases(image, true);
+                }
+                resolve();
+            };
+            image.src = src;
+        });
     }
 
     const setupSpriteCanvases = (image, saveToLS = false) => {
@@ -144,19 +185,31 @@
         });
     }
 
+    const handleTileConfigInputSave = (target) => {
+        const sprite = currentSprite();
+        if (!sprite) return;
+        if (target.dataset.key1 === 'map') {
+            state.map = initializeMapLayers(state.map);
+        }
+        drawMapTiles(
+            state.map, state.tile.size * state.tile.scale,
+            sprite.tiles, handleMapTileClick
+        );
+        saveStateToLocalStorage(state);
+    }
+
     const handleTileConfigInput = ({ target }) => {
         const val = Number(target.value);
         if (!val || (target.dataset.key2 === 'size' && val % 8 != 0)) return;
         state[target.dataset.key1][target.dataset.key2] = val;
         const sprite = currentSprite();
         if (sprite) {
-            initializeSpriteSheet(sprite.name, sprite.imageData, true);
+            initializeSpriteSheet(sprite.name, sprite.imageData, true).then(() => {
+                handleTileConfigInputSave(target);
+            });
+        } else {
+            handleTileConfigInputSave(target);
         }
-        if (target.dataset.key1 === 'map') {
-            state.map = initializeMapLayers(state.map);
-        }
-        drawMapTiles(state.map, state.tile.size * state.tile.scale);
-        saveStateToLocalStorage(state);
     }
 
     ELEMENT.input.mapX.addEventListener('change', handleTileConfigInput);

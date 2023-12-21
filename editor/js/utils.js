@@ -108,6 +108,17 @@
         }
     };
 
+    const getIndexAndCoordsFromClick = (clickX, clickY, canvas, scaledTileSize) => {
+        const {x: xOffset, y: yOffset} = canvas.getBoundingClientRect();
+        const {x, y} = toIndexFromCoords(
+            Math.round(clickX - xOffset),
+            Math.round(clickY - yOffset),
+            scaledTileSize,
+        );
+        const coord = toCoordsFromIndex(x, y, scaledTileSize);
+        return {x, y, xPos: coord.x, yPos: coord.y }
+    }
+
     const tryGetValue = (obj, i, j) => {
         if (Array.isArray(obj[i])) {
             return obj[i][j];
@@ -139,9 +150,10 @@
         return map;
     }
 
-    const drawMapTiles = (map, scaledTileSize) => {
+    const drawMapTiles = (map, scaledTileSize, tiles, onClick) => {
         const canvas = createUniqueCanvas('tilemap-canvas');
         const ctx = canvas.getContext('2d');
+        canvas.addEventListener('click', ({x, y}) => onClick(x, y, canvas, ctx));
         canvas.width = map.sizeX * scaledTileSize;
         canvas.height = map.sizeY * scaledTileSize;
         ELEMENT.section.tileMap.appendChild(canvas);
@@ -150,7 +162,10 @@
             for (let row = 0; row < map.sizeY; row++) {
                 for (let col = 0; col < map.sizeX; col++) {
                     const {x, y} = toCoordsFromIndex(col, row, scaledTileSize);
-                    console.log('item', arr[row][col]);
+                    const data = arr[row][col];
+                    if (data) {
+                        ctx.putImageData(tiles[data[0]][data[1]], x, y);
+                    }
                     ctx.strokeStyle = "black";
                     ctx.strokeRect(
                         x,
@@ -241,7 +256,7 @@
         toggleModal,
         selectElementHighlight,
         deselectElementHighlight,
-        initializeArray,
-        initializeMapLayers
+        initializeMapLayers,
+        getIndexAndCoordsFromClick
     };
 })();
