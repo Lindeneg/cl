@@ -14,6 +14,8 @@
         toggleModal,
         selectElementHighlight,
         deselectElementHighlight,
+        initializeArray,
+        initializeMapLayers
     } = window.clUtils;
 
     const state = {
@@ -23,7 +25,7 @@
         currentLayer: LAYER.TILEMAP,
         sprites: [],
         tile: { size: 0, scale: 0 },
-        map: { tileLayer: { [LAYER.TILEMAP]: [] }, sizeX: 0, sizeY: 0 },
+        map: { tileLayer: {}, sizeX: 0, sizeY: 0 },
     };
 
     const currentSprite = () => {
@@ -42,8 +44,9 @@
         const savedState = getStateFromLocalStorage();
         state.sprites = savedState?.sprites ?? [];
         state.tile = savedState?.tile ?? state.tile;
-        state.map = savedState?.map ?? state.map;
         initializeConfig(savedState);
+        state.map = savedState?.map ?? initializeMapLayers(state.map);
+        drawMapTiles(state.map, state.tile.size * state.tile.scale);
         if (!state.sprites.length) return;
         initializeSpriteSheet(state.sprites[0].name, state.sprites[0].imageData);
         state.spriteIdx = 0;
@@ -133,7 +136,6 @@
         const selectedCtx = selectedCanvas.getContext('2d');
         ctx.drawImage(image, 0, 0, image.width, image.height);
         initSpriteSheetTiles(ctx, image.width, image.height, sprite);
-        drawMapTiles(state.map, sprite);
         if (saveToLS) {
             saveStateToLocalStorage(state);
         }
@@ -147,12 +149,23 @@
         if (!val || (target.dataset.key2 === 'size' && val % 8 != 0)) return;
         state[target.dataset.key1][target.dataset.key2] = val;
         const sprite = currentSprite();
-        if (!sprite) return;
-        initializeSpriteSheet(sprite.name, sprite.imageData, true);
+        if (sprite) {
+            initializeSpriteSheet(sprite.name, sprite.imageData, true);
+        }
+        if (target.dataset.key1 === 'map') {
+            state.map = initializeMapLayers(state.map);
+        }
+        drawMapTiles(state.map, state.tile.size * state.tile.scale);
+        saveStateToLocalStorage(state);
     }
 
+    ELEMENT.input.mapX.addEventListener('change', handleTileConfigInput);
+    ELEMENT.input.mapY.addEventListener('change', handleTileConfigInput);
     ELEMENT.input.tileSize.addEventListener('change', handleTileConfigInput);
     ELEMENT.input.tileScale.addEventListener('change', handleTileConfigInput);
+    ELEMENT.input.layer.addEventListener('change', ({ target }) => {
+        state.currentLayer = Number(target.value);
+    });
     ELEMENT.button.loadedSprites.addEventListener('click', () => {
         toggleModal(state.sprites, handleSavedSpriteClick);
     });

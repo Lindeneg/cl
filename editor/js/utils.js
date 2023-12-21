@@ -38,6 +38,7 @@
         COLLIDABLE: 3,
         PLAYER: 4,
     };
+    const LAYERS = Object.values(LAYER);
 
     const saveStateToLocalStorage = (state) => {
         const stringifiedJson = JSON.stringify(state);
@@ -107,44 +108,57 @@
         }
     };
 
-    const drawFromMapTileArray = (numRows, numCols, ctx, scaledTileSize, cb) => {
-        for (let row = 0; row < numRows; row++) {
-            for (let col = 0; col < numCols; col++) {
-                const {x, y} = toCoordsFromIndex(col, row, scaledTileSize);
-                cb(col, row, x, y);
-                ctx.strokeStyle = "black";
-                ctx.strokeRect(
-                    x, y,
-                    scaledTileSize,
-                    scaledTileSize
-                );
+    const tryGetValue = (obj, i, j) => {
+        if (Array.isArray(obj[i])) {
+            return obj[i][j];
+        }
+        return undefined;
+    }
+
+    const initializeArray = (rows, cols, value, oldArr = []) => {
+        const arr = [];
+        for (let i = 0; i < rows; i++) {
+            if (!Array.isArray(arr[i])) {
+                arr[i] = [];
+            }
+            for (let j = 0; j < cols; j++) {
+                const oldValue = tryGetValue(oldArr, i, j);
+                arr[i][j] = typeof oldValue == 'undefined' ? value : oldValue;
             }
         }
-    };
+        return arr;
+    }
 
-    const drawMapTiles = (map, sprite) => {
+    const initializeMapLayers = (map) => {
+        for (const layer of LAYERS) {
+            map.tileLayer[layer] = initializeArray(
+                map.sizeY, map.sizeX,
+                null, map.tileLayer[layer]
+            );
+        }
+        return map;
+    }
+
+    const drawMapTiles = (map, scaledTileSize) => {
         const canvas = createUniqueCanvas('tilemap-canvas');
         const ctx = canvas.getContext('2d');
-        const layers = Object.values(LAYER);
-        canvas.width = map.sizeX * sprite.scaledTileSize;
-        canvas.height = map.sizeY * sprite.scaledTileSize;
+        canvas.width = map.sizeX * scaledTileSize;
+        canvas.height = map.sizeY * scaledTileSize;
         ELEMENT.section.tileMap.appendChild(canvas);
-        for (const layer of layers) {
-            const arr = map.tileLayer[layer] || [];
-            if (arr.length > 0) {
-                drawFromMapTileArray(
-                    arr.length, arr[0].length,ctx, sprite.scaledTileSize,
-                    (col, row, x, y) => {
-                        const item = arr[row][col];
-                        console.log("draw tile", item);
-                    }
-                );
-            } else {
-                drawFromMapTileArray(map.sizeY, map.sizeX, ctx, sprite.scaledTileSize,
-                    (col, row) => {
-                        safe2DArrayPush(arr, col, row, null);
-                    }
-                );
+        for (const layer of LAYERS) {
+            const arr = map.tileLayer[layer];
+            for (let row = 0; row < map.sizeY; row++) {
+                for (let col = 0; col < map.sizeX; col++) {
+                    const {x, y} = toCoordsFromIndex(col, row, scaledTileSize);
+                    console.log('item', arr[row][col]);
+                    ctx.strokeStyle = "black";
+                    ctx.strokeRect(
+                        x,
+                        y,
+                        scaledTileSize,
+                        scaledTileSize
+                    );
+                }
             }
         }
     };
@@ -227,5 +241,7 @@
         toggleModal,
         selectElementHighlight,
         deselectElementHighlight,
-    }
+        initializeArray,
+        initializeMapLayers
+    };
 })();
