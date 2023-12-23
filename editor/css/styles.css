@@ -11,7 +11,11 @@ section {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+.config-entry:first-child {
+    margin-bottom: 1rem;
 }
 
 #modal-backdrop {
@@ -47,7 +51,6 @@ section {
     padding: 1rem;
 }
 
-
 #spritesheet-section,
 #tilemap-section {
     display: flex;
@@ -56,8 +59,11 @@ section {
     justify-content: center;
 }
 
-#layer-select-container,
-#config-container {
+#spritesheet-section {
+    flex-wrap: wrap-reverse;
+}
+
+#layer-select-container {
     margin-bottom: 1rem;
 }
 
@@ -67,8 +73,8 @@ section {
 }
 
 .config-entry {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .config-entry label {
@@ -84,7 +90,6 @@ section {
     margin-left: 1rem;
 }
 
-
 .saved-sprite {
     border: 1px solid black;
     padding: 1rem;
@@ -94,6 +99,12 @@ section {
 .saved-sprite.selected,
 .saved-sprite:hover {
     border: 1px solid blue;
+}
+
+.select-container {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
 }
 
 /* button from pure-css: https://purecss.io */
@@ -110,7 +121,7 @@ section {
     box-sizing: border-box;
     font-family: inherit;
     font-size: 100%;
-    padding: .5em 1em;
+    padding: 0.5em 1em;
     border: none transparent;
     background-color: #e6e6e6;
     text-decoration: none;

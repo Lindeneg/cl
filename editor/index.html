@@ -1,129 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>CL Tile Editor</title>
-        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="css/styles.css" />
     </head>
     <body>
         <div id="modal-backdrop" class="hidden"></div>
         <div id="modal-wrapper" class="hidden">
             <div id="modal">
-                <div id="modal-sprite-hook">
-                </div>
+                <div id="modal-sprite-hook"></div>
                 <div class="modal-actions">
-                    <button
-                        id="load-selected-sprite"
-                        class="button success">
+                    <button id="load-selected-sprite" class="button success">
                         Load Selected
                     </button>
-                    <button
-                        id="delete-selected-sprite"
-                        class="button error">
+                    <button id="delete-selected-sprite" class="button error">
                         Delete Selected
                     </button>
                 </div>
             </div>
         </div>
         <main>
-            <section id="tilemap-section">
-            </section>
-            <hr/>
+            <section id="tilemap-section"></section>
+            <hr />
             <section id="spritesheet-section">
-                <div id="sprite-container">
-                </div>
+                <div id="sprite-container"></div>
                 <div id="selected-sprite-container">
-                    <strong>Selected Tile:</strong>
                     <div id="selected-sprite-canvas-hook"></div>
-                    <hr/>
-                    <div class="upload-container">
-                        <label
-                            class="button success"
-                            for="sprite-upload">
-                            Upload Spritesheet
-                        </label>
-                        <input
-                        id="sprite-upload"
-                        class="hidden"
-                        name="sprite-upload"
-                        accept="image/png"
-                        type="file"/>
-                        <button
-                            id="loaded-sprites"
-                            class="button secondary"
+                    <div class="select-container">
+                        <div id="mode-select-container" class="config-entry">
+                            <label for="mode-select">Mode</label>
+                            <select
+                                id="mode-select"
+                                name="mode"
+                                data-default="0"
+                                data-key1="drawMode"
                             >
-                            Saved Spritesheets
-                        </button>
+                                <option value="0">DRAW</option>
+                                <option value="1">ERASE</option>
+                            </select>
+                        </div>
+                        <div id="layer-select-container" class="config-entry">
+                            <label for="layer-select">Layer</label>
+                            <select
+                                id="layer-select"
+                                name="layer"
+                                data-default="0"
+                                data-key1="currentLayer"
+                            >
+                                <option value="0">TILEMAP</option>
+                                <option value="1">TERRAIN</option>
+                                <option value="2">ENEMY</option>
+                                <option value="3">COLLIDABLE</option>
+                                <option value="4">PLAYER</option>
+                            </select>
+                        </div>
                     </div>
-                    <hr/>
+                    <hr />
                     <div id="config-container">
                         <div>
                             <div class="config-entry">
-                                <label for="tile-size-input">Tile Size</label>
+                                <label for="map-tile-size-input"
+                                    >Map Tile Size</label
+                                >
                                 <input
-                                id="tile-size-input"
-                                name="tile-size"
-                                type="number"
-                                min="8"
-                                max="256"
-                                step="8"
-                                data-default="32"
-                                data-key1="tile"
-                                data-key2="size"
-                                value="0"/>
-                            </div>
-                            <div class="config-entry">
-                                <label for="tile-scale-input" >Tile Scale</label>
-                                <input
-                                id="tile-scale-input"
-                                name="tile-scale"
-                                type="number"
-                                data-default="1"
-                                data-key1="tile"
-                                data-key2="scale"
-                                value="0"/>
+                                    id="map-tile-size-input"
+                                    name="map-tile-size"
+                                    type="number"
+                                    min="8"
+                                    max="256"
+                                    step="8"
+                                    data-default="32"
+                                    data-key1="map"
+                                    data-key2="tileSize"
+                                    value="0"
+                                />
                             </div>
                         </div>
-                        <div>
+                        <div class="hidden">
+                            <div class="hidden config-entry">
+                                <label for="sprite-tile-scale-input"
+                                    >Sprite Tile Scale</label
+                                >
+                                <input
+                                    disabled
+                                    id="sprite-tile-scale-input"
+                                    name="sprite-tile-scale"
+                                    type="number"
+                                    data-default="1"
+                                    data-key0="sprite"
+                                    data-key1="tileScale"
+                                    value="1"
+                                />
+                            </div>
+                            <div class="hidden config-entry">
+                                <label for="map-tile-scale-input"
+                                    >Map Tile Scale</label
+                                >
+                                <input
+                                    disabled
+                                    id="map-tile-scale-input"
+                                    name="map-tile-scale"
+                                    type="number"
+                                    data-default="1"
+                                    data-key1="map"
+                                    data-key2="tileScale"
+                                    value="1"
+                                />
+                            </div>
+                        </div>
                             <div class="config-entry">
                                 <label for="map-x-input">Map X Size</label>
                                 <input
-                                id="map-x-input"
-                                name="map-x"
-                                type="number"
-                                data-default="10"
-                                data-key1="map"
-                                data-key2="sizeX"
-                                value="0"/>
+                                    id="map-x-input"
+                                    name="map-x"
+                                    type="number"
+                                    data-default="10"
+                                    data-key1="map"
+                                    data-key2="sizeX"
+                                    value="0"
+                                />
                             </div>
                             <div class="config-entry">
                                 <label for="map-y-input">Map Y Size</label>
                                 <input
-                                id="map-y-input"
-                                name="map-y"
-                                type="number"
-                                data-default="10"
-                                data-key1="map"
-                                data-key2="sizeY"
-                                value="0"/>
+                                    id="map-y-input"
+                                    name="map-y"
+                                    type="number"
+                                    data-default="10"
+                                    data-key1="map"
+                                    data-key2="sizeY"
+                                    value="0"
+                                />
                             </div>
-                        </div>
                     </div>
-                    <div id="layer-select-container" class="config-entry">
-                        <label for="layer-select">Layer</label>
-                        <select id="layer-select" name="layer" data-default="0">
-                            <option value="0">TILEMAP</option>
-                            <option value="1">TERRAIN</option>
-                            <option value="2">ENEMY</option>
-                            <option value="3">COLLIDABLE</option>
-                            <option value="4">PLAYER</option>
-                        </select>
+                    <hr />
+                    <div style="margin-bottom: 1rem;" class="config-entry">
+                        <label for="sprite-tile-size-input"
+                            >Sprite Tile Size</label
+                        >
+                        <input
+                            id="sprite-tile-size-input"
+                            name="sprite-tile-size"
+                            type="number"
+                            min="8"
+                            max="256"
+                            step="8"
+                            data-default="32"
+                            data-key1="sprite"
+                            data-key2="tileSize"
+                            value="0"
+                        />
+                    </div>
+                    <div class="upload-container">
+                        <label class="button success" for="sprite-upload">
+                            Upload Spritesheet
+                        </label>
+                        <input
+                            id="sprite-upload"
+                            class="hidden"
+                            name="sprite-upload"
+                            accept="image/png"
+                            type="file"
+                        />
+                        <button id="loaded-sprites" class="button secondary">
+                            Saved Spritesheets
+                        </button>
                     </div>
                 </div>
             </section>
         </main>
-        <script src="js/utils.js"></script>
-        <script src="js/app.js"></script>
+        <script src="js/index.js"></script>
     </body>
 </html>
