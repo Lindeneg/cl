@@ -671,6 +671,34 @@
         }
     };
 
+    const exportTileMap = () => {
+        console.log(state.map);
+        const rows = state.map.sizeY;
+        const cols = state.map.sizeX;
+        for (let layer of LAYERS) {
+            let tileMap = "";
+            const arr = state.map.tileLayer[layer];
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const entry = arr[row][col];
+                    if (!entry) {
+                        tileMap += "&";
+                    } else {
+                        const [, , , x, y] = entry;
+                        tileMap += `${y},${x}`;
+                    }
+                    if (col < cols - 1) {
+                        tileMap += "|";
+                    }
+                }
+                tileMap += "\n";
+            }
+            if (layer === LAYER.TILEMAP) {
+                console.log(tileMap);
+            }
+        }
+    };
+
     /**
      * @param {State} savedState
      * @returns {void}
@@ -707,6 +735,7 @@
                 drawSpriteSheet();
             }
             drawTileMap();
+            exportTileMap();
         });
     };
 
