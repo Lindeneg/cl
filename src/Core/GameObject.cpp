@@ -8,7 +8,7 @@ CL::Core::GameObject::GameObject()
     : mId(mIdCounter++),
       mName(""),
       mTag(Constants::DEFAULT_TAG),
-      mLayer(Constants::DEFAULT_LAYER),
+      mLayer(Constants::TERRAIN_LAYER),
       mComponentTypeMap({}) {}
 
 CL::Core::GameObject::GameObject(GameObjectName name, GameObjectTag tag,

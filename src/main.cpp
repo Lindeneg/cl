@@ -19,7 +19,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
         "tilemap-texture", "./assets/tilemaps/terrain_tiles_v2.png");
     // load map
     auto map = CL::Core::TileMapLoader("tilemap-texture", 2, 32);
-    map.LoadMap("./assets/tilemaps/tile.map", 25, 20);
+    map.LoadMap("./assets/tilemaps/tile.map", 10, 10);
 
     // start game
     while (CL::Manager::GameManager::IsRunning()) {

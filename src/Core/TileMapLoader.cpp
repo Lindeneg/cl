@@ -1,10 +1,49 @@
 #include "TileMapLoader.h"
 
 #include <fstream>
+#include <iostream>
+#include <string>
 
 #include "../Manager/GameObjectManager.h"
 #include "./GameObject.h"
 #include "./TileComponent.h"
+
+bool CL::Core::TileMapLoader::appendCoordToString(std::fstream& stream,
+                                                  std::string* s) {
+    char c{};
+    stream.get(c);
+    if (c == COORD_DELIMITER || c == TILE_DELIMITER) {
+        return true;
+    }
+    if (c == EMPTY_TILE) {
+        return false;
+    }
+    *s += c;
+    return appendCoordToString(stream, s);
+}
+
+bool CL::Core::TileMapLoader::setTileCoords(std::fstream& stream, int* x,
+                                            int* y) {
+    if (stream.eof()) {
+        return false;
+    }
+    std::string sX{};
+    std::string sY{};
+    bool shouldContinue = appendCoordToString(stream, &sY);
+    if (!shouldContinue) {
+        return false;
+    }
+    if (shouldContinue && sY.size() == 0) {
+        return setTileCoords(stream, x, y);
+    }
+    appendCoordToString(stream, &sX);
+    if (sX.size() > 0 && sY.size() > 0) {
+        *x = (std::stoi(sX) * mTileSize);
+        *y = (std::stoi(sY) * mTileSize);
+        return true;
+    }
+    return false;
+}
 
 void CL::Core::TileMapLoader::LoadMap(std::string filePath, int mapSizeX,
                                       int mapSizeY) {
@@ -12,18 +51,14 @@ void CL::Core::TileMapLoader::LoadMap(std::string filePath, int mapSizeX,
     file.open(filePath);
     for (int y = 0; y < mapSizeY; y++) {
         for (int x = 0; x < mapSizeX; x++) {
-            char ch;
-            // get first char in pair (y)
-            file.get(ch);
-            int sourceRectY = atoi(&ch) * mTileSize;
-            // get second char in par (x)
-            file.get(ch);
-            int sourceRectX = atoi(&ch) * mTileSize;
-            // add new tile
-            AddTile(sourceRectX, sourceRectY, x * (mScale * mTileSize),
-                    y * (mScale * mTileSize));
-            // ignore comma
-            file.ignore();
+            int cX{};
+            int cY{};
+            bool didSet = setTileCoords(file, &cX, &cY);
+            if (didSet) {
+                std::cout << "y: " << y << ", x: " << x << "|cY: " << cY
+                          << ", cX: " << cX << '\n';
+                AddTile(cX, cY, x * mScaledTile, y * mScaledTile);
+            }
         }
     }
     file.close();
