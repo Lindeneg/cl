@@ -3,6 +3,7 @@
 #include "./Manager/GameManager.h"
 #include "Core/TileMapLoader.h"
 #include "Manager/AssetManager.h"
+#include "Utilities/Constants.h"
 
 // editor should save to some format, either use json
 // https://github.com/nlohmann/json
@@ -14,11 +15,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
         return EXIT_FAILURE;
     }
 
-    // load assets
+    //       load assets
     CL::Manager::AssetManager::AddTexture(
         "tilemap-texture", "./assets/tilemaps/terrain_tiles_v2.png");
-    // load map
-    auto map = CL::Core::TileMapLoader("tilemap-texture", 2, 32);
+    //   load map
+    auto map = CL::Core::TileMapLoader("tilemap-texture", 32, 2,
+                                       CL::Constants::LayerType::TILEMAP_LAYER);
     map.LoadMap("./assets/tilemaps/tile.map", 10, 10);
 
     // start game

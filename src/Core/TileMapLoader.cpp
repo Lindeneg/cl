@@ -12,7 +12,8 @@ bool CL::Core::TileMapLoader::appendCoordToString(std::fstream& stream,
                                                   std::string* s) {
     char c{};
     stream.get(c);
-    if (c == COORD_DELIMITER || c == TILE_DELIMITER) {
+    if (c == COORD_DELIMITER || c == TILE_DELIMITER || c == LAYER_START ||
+        c == LAYER_END) {
         return true;
     }
     if (c == EMPTY_TILE) {
@@ -23,23 +24,29 @@ bool CL::Core::TileMapLoader::appendCoordToString(std::fstream& stream,
 }
 
 bool CL::Core::TileMapLoader::setTileCoords(std::fstream& stream, int* x,
-                                            int* y) {
+                                            int* y, int* l) {
     if (stream.eof()) {
         return false;
     }
     std::string sX{};
     std::string sY{};
-    bool shouldContinue = appendCoordToString(stream, &sY);
-    if (!shouldContinue) {
+    std::string sL{};
+    bool continueToX = appendCoordToString(stream, &sY);
+    if (!continueToX) {
         return false;
     }
-    if (shouldContinue && sY.size() == 0) {
-        return setTileCoords(stream, x, y);
+    if (continueToX && sY.size() == 0) {
+        return setTileCoords(stream, x, y, l);
     }
-    appendCoordToString(stream, &sX);
-    if (sX.size() > 0 && sY.size() > 0) {
+    bool continueToLayer = appendCoordToString(stream, &sX);
+    if (!continueToLayer) {
+        return false;
+    }
+    appendCoordToString(stream, &sL);
+    if (sX.size() > 0 && sY.size() > 0 && sL.size() > 0) {
         *x = (std::stoi(sX) * mTileSize);
         *y = (std::stoi(sY) * mTileSize);
+        *l = std::stoi(sL);
         return true;
     }
     return false;
@@ -53,10 +60,9 @@ void CL::Core::TileMapLoader::LoadMap(std::string filePath, int mapSizeX,
         for (int x = 0; x < mapSizeX; x++) {
             int cX{};
             int cY{};
-            bool didSet = setTileCoords(file, &cX, &cY);
+            int cL{};
+            bool didSet = setTileCoords(file, &cX, &cY, &cL);
             if (didSet) {
-                std::cout << "y: " << y << ", x: " << x << "|cY: " << cY
-                          << ", cX: " << cX << '\n';
                 AddTile(cX, cY, x * mScaledTile, y * mScaledTile);
             }
         }
@@ -65,8 +71,9 @@ void CL::Core::TileMapLoader::LoadMap(std::string filePath, int mapSizeX,
 }
 
 void CL::Core::TileMapLoader::AddTile(int srcX, int srcY, int x, int y) {
+    // TODO GET TEXTURE, TILESIZE AND SCALE
     auto* newTile{Manager::GameObjectManager::AddGameObject(
-        "tile", Constants::DEFAULT_TAG, Constants::TILEMAP_LAYER)};
-    newTile->AddComponent<TileComponent>(srcX, srcY, x, y, mTileSize, mScale,
-                                         mTextureId);
+        "tile", Constants::DEFAULT_TAG, mLayer)};
+    newTile->AddComponent<TileComponent>(srcX, srcY, x, y, mTileSize,
+                                         mTileScale, mTextureId);
 }

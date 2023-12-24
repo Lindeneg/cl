@@ -11,6 +11,7 @@ namespace CL::Core {
 class TileComponent : public Component {
    private:
     std::string mTextureId;
+    SDL_Texture* mTexture;
     SDL_Rect mSrcRect;
     SDL_Rect mDstRect;
     Vector2 mPosition;

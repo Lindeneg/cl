@@ -9,6 +9,7 @@ CL::Core::TileComponent::TileComponent(int srcX, int srcY, int x, int y,
                                        int tileSize, int tileScale,
                                        std::string textureId) {
     mTextureId = textureId;
+    mTexture = Manager::AssetManager::GetTexture(mTextureId);
     mSrcRect.x = srcX;
     mSrcRect.y = srcY;
     mSrcRect.w = tileSize;
@@ -29,7 +30,6 @@ void CL::Core::TileComponent::Update(float) {
 }
 
 void CL::Core::TileComponent::Render() {
-    static SDL_Texture* texture = Manager::AssetManager::GetTexture(mTextureId);
-    Manager::RenderManager::RenderTexture(texture, mSrcRect, mDstRect,
+    Manager::RenderManager::RenderTexture(mTexture, mSrcRect, mDstRect,
                                           SDL_FLIP_NONE);
 }

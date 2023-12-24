@@ -250,6 +250,7 @@
     const handleFileUpload = (target, callback) => {
         const fileReader = new FileReader();
         fileReader.onload = () => {
+            console.log(target.files[0]);
             callback(target.files[0].name, fileReader.result.toString());
         };
         fileReader.readAsDataURL(target.files[0]);
@@ -672,9 +673,12 @@
     };
 
     const exportTileMap = () => {
-        console.log(state.map);
         const rows = state.map.sizeY;
         const cols = state.map.sizeX;
+        const idMap = state.sprites.reduce((acc, cur, i) => {
+            acc[cur.name] = i;
+            return acc;
+        }, {});
         for (let layer of LAYERS) {
             let tileMap = "";
             const arr = state.map.tileLayer[layer];
@@ -684,8 +688,8 @@
                     if (!entry) {
                         tileMap += "&";
                     } else {
-                        const [, , , x, y] = entry;
-                        tileMap += `${y},${x}`;
+                        const [, , name, x, y] = entry;
+                        tileMap += `${y},${x}(${idMap[name]})`;
                     }
                     if (col < cols - 1) {
                         tileMap += "|";
@@ -693,9 +697,7 @@
                 }
                 tileMap += "\n";
             }
-            if (layer === LAYER.TILEMAP) {
-                console.log(tileMap);
-            }
+            //console.log(layer, tileMap);
         }
     };
 
